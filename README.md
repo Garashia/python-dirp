@@ -2,6 +2,9 @@
 
 Python bindings for the Go implementation of `dirp`.
 
+Go `dirp` upstream (pinned commit):
+[Garashia/DIRP @ d8ac3c5](https://github.com/Garashia/DIRP/tree/d8ac3c501b69de5777ad5985c7b324d3aaea30dc)
+
 ## Install
 
 ```bash
