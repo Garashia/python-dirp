@@ -1,0 +1,8 @@
+include main_c.go
+include go.mod
+include python/README.md
+include python/PUBLISH.md
+include python/build_go_lib.py
+recursive-include python/dirp *.py
+recursive-include dirp_core *.go
+include dirp_core/go.mod
