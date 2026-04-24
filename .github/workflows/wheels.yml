@@ -8,6 +8,8 @@ on:
 
 jobs:
   build-wheels:
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     strategy:
       fail-fast: false
       matrix:
@@ -43,6 +45,8 @@ jobs:
           path: dist/*.whl
 
   build-sdist:
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
