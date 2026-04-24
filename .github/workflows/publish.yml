@@ -15,6 +15,11 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      CIBW_BUILD: "cp311-manylinux_x86_64"
+      CIBW_MANYLINUX_X86_64_IMAGE: "manylinux_2_28"
+      CIBW_BEFORE_ALL_LINUX: "curl -fsSL https://go.dev/dl/go1.22.12.linux-amd64.tar.gz -o /tmp/go.tar.gz && rm -rf /usr/local/go && tar -C /usr/local -xzf /tmp/go.tar.gz"
+      CIBW_ENVIRONMENT_LINUX: "PATH=/usr/local/go/bin:$PATH CGO_ENABLED=1"
     permissions:
       id-token: write
     steps:
@@ -38,8 +43,9 @@ jobs:
         run: |
           rm -rf dist
           python -m pip install --upgrade pip
-          python -m pip install build
+          python -m pip install build cibuildwheel
           python -m build --sdist
+          python -m cibuildwheel --output-dir dist
 
       - name: Publish to TestPyPI
         if: ${{ github.event.inputs.repository == 'testpypi' }}

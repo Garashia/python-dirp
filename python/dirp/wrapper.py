@@ -92,6 +92,15 @@ def parse(dsl: str) -> list[dict[str, Any]]:
     return payload.get("nodes", [])
 
 
+def parse_file(path: str) -> list[dict[str, Any]]:
+    text = Path(path).read_text(encoding="utf-8")
+    return parse(text)
+
+
+def validate(dsl: str) -> None:
+    _ = parse(dsl)
+
+
 def build(root: str, dsl: str) -> None:
     payload = _call_json(
         _LIB.BuildDirpFromDSLJSON,

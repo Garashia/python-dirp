@@ -2,3 +2,7 @@ WINDOWS_RELEASE_INSTRUCTIONS.md
 Ver.py
 ver_up/
 dist/
+build/
+.venv/
+*.egg-info/
+__pycache__/
