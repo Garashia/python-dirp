@@ -1,0 +1,4 @@
+[submodule "dirp_core"]
+	path = dirp_core
+	url = https://github.com/Garashia/DIRP.git
+	branch = main
