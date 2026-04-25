@@ -17,6 +17,7 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       CIBW_BUILD: "cp311-*"
+      CIBW_SKIP: "*-musllinux_*"
       CIBW_ARCHS_LINUX: "x86_64"
       CIBW_MANYLINUX_X86_64_IMAGE: "manylinux_2_28"
       CIBW_BEFORE_ALL_LINUX: "curl -fsSL https://go.dev/dl/go1.22.12.linux-amd64.tar.gz -o /tmp/go.tar.gz && rm -rf /usr/local/go && tar -C /usr/local -xzf /tmp/go.tar.gz"
@@ -53,7 +54,7 @@ jobs:
       - name: Smoke test built wheel
         run: |
           python -m pip install --upgrade pip
-          python -m pip install wheelhouse/*.whl
+          python -c "import glob,subprocess,sys; ws=glob.glob('wheelhouse/*.whl'); print('wheels:', ws); (sys.exit('no wheels found') if not ws else subprocess.run([sys.executable, '-m', 'pip', 'install', *ws], check=True))"
           python -c "import dirp; print(dirp.parse('app{src,bin}'))"
 
       - name: Upload wheel artifact
