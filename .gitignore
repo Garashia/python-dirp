@@ -6,3 +6,4 @@ build/
 .venv/
 *.egg-info/
 __pycache__/
+current_status.md

@@ -13,10 +13,20 @@ on:
           - pypi
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
+  build-wheels:
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      CIBW_BUILD: "cp311-*"
+      CIBW_ARCHS_LINUX: "x86_64"
+      CIBW_MANYLINUX_X86_64_IMAGE: "manylinux_2_28"
+      CIBW_BEFORE_ALL_LINUX: "curl -fsSL https://go.dev/dl/go1.22.12.linux-amd64.tar.gz -o /tmp/go.tar.gz && rm -rf /usr/local/go && tar -C /usr/local -xzf /tmp/go.tar.gz"
+      CIBW_ENVIRONMENT_LINUX: "PATH=/usr/local/go/bin:$PATH CGO_ENABLED=1"
+      CIBW_REPAIR_WHEEL_COMMAND_LINUX: ""
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -34,19 +44,75 @@ jobs:
           go-version-file: "go.mod"
           cache: false
 
-      - name: Build distributions
+      - name: Build wheel
         run: |
-          rm -rf dist
+          python -m pip install --upgrade pip
+          python -m pip install cibuildwheel
+          python -m cibuildwheel --output-dir wheelhouse
+
+      - name: Smoke test built wheel
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install wheelhouse/*.whl
+          python -c "import dirp; print(dirp.parse('app{src,bin}'))"
+
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl
+
+  build-sdist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: "go.mod"
+          cache: false
+
+      - name: Build sdist
+        run: |
           python -m pip install --upgrade pip
           python -m pip install build
           python -m build --sdist
+
+      - name: Upload sdist artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  publish:
+    needs: [build-wheels, build-sdist]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Download distribution artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: dist
 
       - name: Publish to TestPyPI
         if: ${{ github.event.inputs.repository == 'testpypi' }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
+          packages-dir: dist
 
       - name: Publish to PyPI
         if: ${{ github.event.inputs.repository == 'pypi' }}
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist
