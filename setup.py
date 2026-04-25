@@ -3,9 +3,17 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 from setuptools import setup
+from setuptools.dist import Distribution
 from setuptools.command.build_py import build_py as _build_py
 
 ROOT = Path(__file__).resolve().parent
+
+
+class BinaryDistribution(Distribution):
+    """Treat package as platform-specific so wheel uses platlib."""
+
+    def has_ext_modules(self) -> bool:
+        return True
 
 
 def _build_go_shared_library() -> None:
@@ -46,4 +54,4 @@ else:
     cmdclass = {"build_py": build_py}
 
 
-setup(cmdclass=cmdclass)
+setup(cmdclass=cmdclass, distclass=BinaryDistribution)

@@ -8,4 +8,7 @@ build/
 .venv/
 *.egg-info/
 __pycache__/
+*.pyc
+python/dirp/dirp.dll
+python/dirp/dirp.h
 current_status.md
