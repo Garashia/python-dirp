@@ -37,6 +37,7 @@ What the workflow does:
 - Smoke test each built wheel (`import dirp` + parse sample)
 - Build sdist
 - Publish wheels + sdist to TestPyPI
+- Linux builds skip `musllinux` and smoke-test wheel install uses Python `glob` to stay cross-shell (bash/PowerShell).
 
 If any build/smoke step fails, fix before production publish.
 
