@@ -105,6 +105,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           path: dist
+          merge-multiple: true
 
       - name: Publish to TestPyPI
         if: ${{ github.event.inputs.repository == 'testpypi' }}
