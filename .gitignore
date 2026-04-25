@@ -2,6 +2,7 @@ WINDOWS_RELEASE_INSTRUCTIONS.md
 Ver.py
 Git.py
 ver_up/
+Wiki/
 dist/
 build/
 .venv/
