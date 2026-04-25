@@ -23,6 +23,9 @@ jobs:
       CIBW_MANYLINUX_X86_64_IMAGE: "manylinux_2_28"
       CIBW_BEFORE_ALL_LINUX: "curl -fsSL https://go.dev/dl/go1.22.12.linux-amd64.tar.gz -o /tmp/go.tar.gz && rm -rf /usr/local/go && tar -C /usr/local -xzf /tmp/go.tar.gz"
       CIBW_ENVIRONMENT_LINUX: "PATH=/usr/local/go/bin:$PATH CGO_ENABLED=1"
+      # Temporary: keep Linux wheel build for smoke checks, but skip auditwheel repair
+      # because bundled libdirp.so is currently placed under purelib.
+      CIBW_REPAIR_WHEEL_COMMAND_LINUX: ""
     strategy:
       fail-fast: false
       matrix:
@@ -106,6 +109,10 @@ jobs:
         with:
           path: dist
           merge-multiple: true
+
+      - name: Drop unsupported Linux wheels before upload
+        run: |
+          rm -f dist/*linux_x86_64.whl
 
       - name: Publish to TestPyPI
         if: ${{ github.event.inputs.repository == 'testpypi' }}
