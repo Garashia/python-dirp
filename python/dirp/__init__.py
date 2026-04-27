@@ -1,3 +1,3 @@
-from .wrapper import DirpError, build, parse, parse_file, validate
+from .wrapper import DirpError, build, graph, parse, parse_file, validate
 
-__all__ = ["DirpError", "parse", "parse_file", "validate", "build"]
+__all__ = ["DirpError", "parse", "parse_file", "graph", "validate", "build"]

@@ -97,6 +97,31 @@ def parse_file(path: str) -> list[dict[str, Any]]:
     return parse(text)
 
 
+def _graph_lines(nodes: list[dict[str, Any]]) -> list[str]:
+    lines: list[str] = []
+
+    def walk(node: dict[str, Any], prefix: str, is_last: bool) -> None:
+        name = str(node.get("name", ""))
+        connector = "`-- " if is_last else "|-- "
+        lines.append(f"{prefix}{connector}{name}/")
+
+        children = node.get("children") or []
+        next_prefix = f"{prefix}{'    ' if is_last else '|   '}"
+        for idx, child in enumerate(children):
+            walk(child, next_prefix, idx == len(children) - 1)
+
+    for idx, n in enumerate(nodes):
+        walk(n, "", idx == len(nodes) - 1)
+
+    return lines
+
+
+def graph(dsl: str) -> str:
+    nodes = parse(dsl)
+    lines = _graph_lines(nodes)
+    return "\n".join(lines)
+
+
 def validate(dsl: str) -> None:
     _ = parse(dsl)
 
